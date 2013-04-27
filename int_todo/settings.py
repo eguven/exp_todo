@@ -1,3 +1,5 @@
+import os
+
 # Django settings for int_todo project.
 
 DEBUG = True
@@ -14,7 +16,7 @@ DATABASES = {
         # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'ENGINE': 'django.db.backends.sqlite3',
         # TODO: Filename should be computed dynamically
-        'NAME': 'var/data.db',
+        'NAME': os.path.join(os.path.dirname(__file__), '..', 'var', 'data.db'),
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
