@@ -21,6 +21,9 @@ $(function(){
       };
     },
 
+    // patch Django model's pk as idAttribute
+    idAttribute: "pk",
+
     // Ensure that each todo created has `title`.
     initialize: function() {
       if (!this.get("title")) {
