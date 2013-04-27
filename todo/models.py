@@ -20,7 +20,10 @@ class TodoItem(models.Model):
 
     def to_json(self):
         """Prepare structure to be serialized as json"""
-        return {
+        data = {
             'title': self.title,
             'order': self.order,
             'done': self.done}
+        if self.pk:
+            data['pk'] = self.pk
+        return data
