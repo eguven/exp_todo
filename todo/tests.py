@@ -64,6 +64,25 @@ class RestApiTests(TestCase):
         response = self.client.get(reverse('todo_api:handle_rest_call'))
         self.assertEqual(expected, response.content)
 
+    def test_put(self):
+        not_found_response = self.client.put(
+            reverse('todo_api:handle_rest_call_id', args=('1',)),
+            data='{"pk": 1}', content_type='application/json')
+        self.assertEqual(404, not_found_response.status_code)
+        item = TodoItem(title='foo', order=1, done=False)
+        item.save()
+        put_data = item.to_json()
+        put_data['done'] = True
+        put_data_json = json.dumps(put_data)
+        response = self.client.put(
+            reverse('todo_api:handle_rest_call_id', args=('1',)),
+            data=put_data_json, content_type='application/json')
+        item = TodoItem.objects.get(pk=1)
+        response = self.client.get(
+            reverse('todo_api:handle_rest_call_id', args=('1',)))
+        expected = json.loads(response.content)
+        self.assertEqual(expected, item.to_json())
+        self.assertTrue(item.done)
 
     def test_delete(self):
         not_found_response = self.client.delete(
