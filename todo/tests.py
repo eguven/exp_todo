@@ -117,3 +117,38 @@ class RestApiTests(TestCase):
         response = self.client.get(reverse('todo_api:handle_rest_call'))
         self.assertEqual('[]', response.content)
 
+    def test_user_access(self):
+        '''Add TodoItems with different users and ensure they only see
+        what they own
+        '''
+        # add second user
+        self.client_2 = Client(enforce_csrf_checks=True)
+        credentials_2 = {'username': 'user2', 'password': 'pass2'}
+        call_command('adduser', *credentials_2.values())
+        self.assertTrue(self.client_2.login(**credentials_2))
+        self.user_2 = User.objects.get(username='user2')
+        # insert some TodoItems
+        for pk in xrange(1, 4):
+            data = {'title': 'T%d U%d' % (pk, self.user.pk), 'order': pk}
+            self.user.todoitem_set.create(**data)
+        for pk in xrange(1, 3):
+            data = {'title': 'T%d U%d' % (pk, self.user_2.pk), 'order': pk}
+            self.user_2.todoitem_set.create(**data)
+        # TodoItem counts; 3 & 2 respectively
+        response = self.client.get(reverse('todo_api:handle_rest_call'))
+        self.assertEqual(3, len(json.loads(response.content)))
+        response = self.client_2.get(reverse('todo_api:handle_rest_call'))
+        self.assertEqual(2, len(json.loads(response.content)))
+        # Single TodoItem 404, pk=4 belongs to second user
+        response = self.client.get(
+            reverse('todo_api:handle_rest_call_id', args=('4',)))
+        self.assertEqual(404, response.status_code)
+        # pk=1 belongs to first user
+        response = self.client_2.delete(
+            reverse('todo_api:handle_rest_call_id', args=('1',)))
+        self.assertEqual(404, response.status_code)
+        # redo with correct user
+        response = self.client.delete(
+            reverse('todo_api:handle_rest_call_id', args=('1',)))
+        response = self.client.get(reverse('todo_api:handle_rest_call'))
+        self.assertEqual(2, len(json.loads(response.content)))
