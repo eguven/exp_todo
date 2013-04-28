@@ -37,6 +37,14 @@ body {
 	padding: 0 0 10px 0;
 }
 
+#todoapp h4 {
+	font-size: 14px;
+	/*font-weight: bold;*/
+	text-align: center;
+	padding: 0 0 10px 0;
+	margin-top: -20px;
+}
+
 #todoapp input[type="text"] {
 	width: 466px;
 	font-size: 24px;

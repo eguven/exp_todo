@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -11,6 +12,7 @@ class TodoItem(models.Model):
     title = models.TextField()
     order = models.IntegerField(blank=True, null=True)
     done = models.BooleanField(default=False)
+    user = models.ForeignKey(User, blank=True, null=True)
 
     def __repr__(self):
         return '<TodoItem %s>' % (self.title[:60].encode('utf-8'))

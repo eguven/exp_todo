@@ -13,6 +13,9 @@
 
     <header>
       <h1>Todos</h1>
+      {% if not request.user.is_anonymous %}
+        <h4>Welcome, {{ request.user.username }}. <a href="/accounts/logout">Logout</a></h4>
+      {% endif %}
       <input id="new-todo" type="text" placeholder="What needs to be done?">
     </header>
 
@@ -44,7 +47,7 @@
   <script>
     // TODO: Should be based on some kind of loader, check requirejs
     var cfg = {
-      rest_base: '{% firstof request.GET.rest_base "/rest/" %}'
+      rest_base: '{% firstof request.GET.rest_base "/rest-empty/" %}'
     };
   </script>
   <script src="{{ STATIC_URL }}todo_client/vendor/json2.js"></script>
